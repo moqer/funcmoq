@@ -47,7 +47,7 @@ func TestSlice_Int(t *testing.T) {
 	result.Returning(nil, expected)
 	var actual []int
 	var err error
-	assert.Nil(t, result.Retrieve(err, &actual))
+	assert.Nil(t, result.Retrieve(&err, &actual))
 	for i := range expected {
 		assert.Equal(t, actual[i], expected[i])
 	}
@@ -59,7 +59,7 @@ func TestSlice_CustomStruct(t *testing.T) {
 	result.Returning(nil, expected)
 	var actual []CustomStruct
 	var err error
-	assert.Nil(t, result.Retrieve(err, &actual))
+	assert.Nil(t, result.Retrieve(&err, &actual))
 	for i := range expected {
 		assert.Equal(t, actual[i], expected[i])
 	}
@@ -71,7 +71,7 @@ func TestArray_Int(t *testing.T) {
 	result.Returning(nil, expected)
 	var actual [4]int
 	var err error
-	assert.Nil(t, result.Retrieve(err, &actual))
+	assert.Nil(t, result.Retrieve(&err, &actual))
 	for i := range expected {
 		assert.Equal(t, actual[i], expected[i])
 	}
@@ -83,7 +83,7 @@ func TestArray_CustomStruct(t *testing.T) {
 	result.Returning(nil, expected)
 	var actual [2]CustomStruct
 	var err error
-	assert.Nil(t, result.Retrieve(err, &actual))
+	assert.Nil(t, result.Retrieve(&err, &actual))
 	for i := range expected {
 		assert.Equal(t, actual[i], expected[i])
 	}
@@ -97,7 +97,7 @@ func TestArray_CustomStructPointers(t *testing.T) {
 	result.Returning(nil, expected)
 	var actual [2]*CustomStruct
 	var err error
-	assert.Nil(t, result.Retrieve(err, &actual))
+	assert.Nil(t, result.Retrieve(&err, &actual))
 	for i := range expected {
 		assert.Equal(t, actual[i], expected[i])
 	}
@@ -109,7 +109,7 @@ func TestElement_Int(t *testing.T) {
 	result.Returning(nil, expected)
 	var actual int
 	var err error
-	assert.Nil(t, result.Retrieve(err, &actual))
+	assert.Nil(t, result.Retrieve(&err, &actual))
 	assert.Equal(t, expected, actual)
 }
 
@@ -119,7 +119,7 @@ func TestElement_string(t *testing.T) {
 	result.Returning(nil, expected)
 	var actual string
 	var err error
-	assert.Nil(t, result.Retrieve(err, &actual))
+	assert.Nil(t, result.Retrieve(&err, &actual))
 	assert.Equal(t, expected, actual)
 }
 
@@ -129,7 +129,7 @@ func TestElement_CustomStruct(t *testing.T) {
 	result.Returning(nil, expected)
 	var actual CustomStruct
 	var err error
-	assert.Nil(t, result.Retrieve(err, &actual))
+	assert.Nil(t, result.Retrieve(&err, &actual))
 	assert.Equal(t, expected, actual)
 }
 
@@ -140,7 +140,7 @@ func TestElement_IntPointer(t *testing.T) {
 	result.Returning(nil, expected)
 	var actual *int
 	var err error
-	assert.Nil(t, result.Retrieve(err, &actual))
+	assert.Nil(t, result.Retrieve(&err, &actual))
 	assert.Equal(t, expected, actual)
 }
 func TestElement_StringPointer(t *testing.T) {
@@ -150,7 +150,7 @@ func TestElement_StringPointer(t *testing.T) {
 	result.Returning(nil, expected)
 	var actual *string
 	var err error
-	assert.Nil(t, result.Retrieve(err, &actual))
+	assert.Nil(t, result.Retrieve(&err, &actual))
 	assert.Equal(t, expected, actual)
 }
 func TestElement_CustomStringPointer(t *testing.T) {
@@ -160,7 +160,7 @@ func TestElement_CustomStringPointer(t *testing.T) {
 	result.Returning(nil, expected)
 	var actual *CustomStruct
 	var err error
-	assert.Nil(t, result.Retrieve(err, &actual))
+	assert.Nil(t, result.Retrieve(&err, &actual))
 	assert.Equal(t, expected, actual)
 }
 func TestElement_EmptyInterface(t *testing.T) {
@@ -169,7 +169,7 @@ func TestElement_EmptyInterface(t *testing.T) {
 	result.Returning(nil, expected)
 	var actual interface{}
 	var err error
-	assert.Nil(t, result.Retrieve(err, &actual))
+	assert.Nil(t, result.Retrieve(&err, &actual))
 	assert.Equal(t, expected, actual)
 }
 
@@ -179,7 +179,7 @@ func TestElement_TesterInterface(t *testing.T) {
 	result.Returning(nil, expected)
 	var actual CustomStruct
 	var err error
-	assert.Nil(t, result.Retrieve(err, &actual))
+	assert.Nil(t, result.Retrieve(&err, &actual))
 	assert.Equal(t, expected, actual)
 }
 
@@ -189,6 +189,6 @@ func TestElement_NilErrorInterface(t *testing.T) {
 	result.Returning(nil, expected)
 	var actual error
 	var err error
-	assert.Nil(t, result.Retrieve(err, &actual))
+	assert.Nil(t, result.Retrieve(&err, &actual))
 	assert.Equal(t, expected, actual)
 }

@@ -1,8 +1,6 @@
 package funcmoq
 
 import (
-	"errors"
-
 	"github.com/mitchellh/hashstructure"
 )
 
@@ -20,12 +18,12 @@ type ResRegistry struct {
 
 // Returner .
 type Returner interface {
-	Returning(err error, args ...interface{})
+	Returning(args ...interface{})
 }
 
 // Retriever .
 type Retriever interface {
-	Retrieve(err error, args ...interface{}) error
+	Retrieve(args ...interface{}) error
 }
 
 // For .
@@ -36,9 +34,10 @@ func (h ResRegistry) For(key ...interface{}) Retriever {
 	}
 	result, exists := h.results[hash]
 	if !exists {
-		return &Result{
-			err: errors.New("This key wasn't registered"),
-		}
+		// return &Result{
+		// 	err: errors.New("This key wasn't registered"),
+		// }
+		//todo panic
 	}
 	return result
 }
