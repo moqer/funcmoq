@@ -1,19 +1,23 @@
 package funcmoq
 
 import (
+	"testing"
+
 	"github.com/mitchellh/hashstructure"
 )
 
-// NewResRegistry .
-func NewResRegistry() *ResRegistry {
-	return &ResRegistry{
-		results: make(map[uint64]*Result),
+// NewFuncMoq .
+func NewFuncMoq(t *testing.T) *FuncMoq {
+	return &FuncMoq{
+		t:       t,
+		results: make(map[uint64]*Store),
 	}
 }
 
-// ResRegistry .
-type ResRegistry struct {
-	results map[uint64]*Result
+// FuncMoq .
+type FuncMoq struct {
+	t       *testing.T
+	results map[uint64]*Store
 }
 
 // Returner .
@@ -23,32 +27,29 @@ type Returner interface {
 
 // Retriever .
 type Retriever interface {
-	Retrieve(args ...interface{}) error
+	Retrieve(args ...interface{})
 }
 
 // For .
-func (h ResRegistry) For(key ...interface{}) Retriever {
+func (m FuncMoq) For(key ...interface{}) Retriever {
 	hash, err := hashstructure.Hash(key, nil)
 	if err != nil {
-		panic(err) //testcode i think it's ok
+		m.t.Fatal("Can't create hash for keys", err)
 	}
-	result, exists := h.results[hash]
+	result, exists := m.results[hash]
 	if !exists {
-		// return &Result{
-		// 	err: errors.New("This key wasn't registered"),
-		// }
-		//todo panic
+		m.t.Fatal("This key wasn't registered")
 	}
 	return result
 }
 
 // With .
-func (h ResRegistry) With(key ...interface{}) Returner {
-	var br Result
+func (m FuncMoq) With(key ...interface{}) Returner {
+	br := NewStore(m.t)
 	hash, err := hashstructure.Hash(key, nil)
 	if err != nil {
-		panic(err) //testcode i think it's ok
+		m.t.Fatal("Can't create hash for keys", err)
 	}
-	h.results[hash] = &br
-	return &br
+	m.results[hash] = br
+	return br
 }

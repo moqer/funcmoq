@@ -1,12 +1,20 @@
 package funcmoq
 
 import (
-	"errors"
 	"reflect"
+	"testing"
 )
+
+// NewStore .
+func NewStore(t *testing.T) *Store {
+	return &Store{
+		t: t,
+	}
+}
 
 // Store .
 type Store struct {
+	t      *testing.T
 	values []interface{}
 }
 
@@ -16,20 +24,20 @@ func (r *Store) Returning(args ...interface{}) {
 }
 
 // Retrieve .
-func (r *Store) Retrieve(args ...interface{}) error {
+func (r *Store) Retrieve(args ...interface{}) {
 	if len(r.values) != len(args) {
-		return errors.New("cant convert object")
+		r.t.Fatal("Can't convert object")
 	}
 
 	for i := range r.values {
 		v1 := reflect.ValueOf(r.values[i])
 		v2 := reflect.ValueOf(args[i])
 		if v2.Kind() != reflect.Ptr {
-			return errors.New("has to be a pointer")
+			r.t.Fatal("has to be a pointer")
 		}
 		ve := v2.Elem()
 		if !ve.CanSet() {
-			return errors.New("cant set object")
+			r.t.Fatal("cant set object")
 		}
 		if r.values[i] == nil {
 			ve.Set(reflect.Zero(ve.Type()))
@@ -41,9 +49,7 @@ func (r *Store) Retrieve(args ...interface{}) error {
 		} else if t.ConvertibleTo(ve.Type()) {
 			ve.Set(v1.Convert(ve.Type()))
 		} else {
-			return errors.New("cant assign object")
+			r.t.Fatal("cant assign object")
 		}
-
 	}
-	return nil
 }
