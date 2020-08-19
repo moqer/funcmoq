@@ -1,6 +1,7 @@
 package funcmoq
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 )
@@ -14,8 +15,9 @@ func NewStore(t *testing.T) *Store {
 
 // Store .
 type Store struct {
-	t      *testing.T
-	values []interface{}
+	t                *testing.T
+	values           []interface{}
+	retrieveFinished func()
 }
 
 // Returning .
@@ -25,19 +27,27 @@ func (r *Store) Returning(args ...interface{}) {
 
 // Retrieve .
 func (r *Store) Retrieve(args ...interface{}) {
+	if err := r.retrieve(args...); err != nil {
+		r.t.Fatal(err)
+	}
+	r.retrieveFinished()
+}
+
+// retrieve implementation of Retrieve method, used to expose the error for inspection
+func (r *Store) retrieve(args ...interface{}) error {
 	if len(r.values) != len(args) {
-		r.t.Fatal("Can't convert object")
+		return errors.New("Can't convert object")
 	}
 
 	for i := range r.values {
 		v1 := reflect.ValueOf(r.values[i])
 		v2 := reflect.ValueOf(args[i])
 		if v2.Kind() != reflect.Ptr {
-			r.t.Fatal("has to be a pointer")
+			return errors.New("has to be a pointer")
 		}
 		ve := v2.Elem()
 		if !ve.CanSet() {
-			r.t.Fatal("cant set object")
+			return errors.New("cant set object")
 		}
 		if r.values[i] == nil {
 			ve.Set(reflect.Zero(ve.Type()))
@@ -49,7 +59,8 @@ func (r *Store) Retrieve(args ...interface{}) {
 		} else if t.ConvertibleTo(ve.Type()) {
 			ve.Set(v1.Convert(ve.Type()))
 		} else {
-			r.t.Fatal("cant assign object")
+			return errors.New("cant assign object")
 		}
 	}
+	return nil
 }
