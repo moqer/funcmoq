@@ -6,11 +6,15 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
-	"testing"
 )
 
+type tester interface {
+	Helper()
+	Errorf(str string, v ...interface{})
+}
+
 // NewStore .
-func NewStore(t *testing.T) *Store {
+func NewStore(t tester) *Store {
 	return &Store{
 		t: t,
 	}
@@ -18,14 +22,14 @@ func NewStore(t *testing.T) *Store {
 
 // Store .
 type Store struct {
-	t                *testing.T
+	t                tester
 	values           []interface{}
 	setLocation      string
 	retrieveFinished func()
 }
 
-// Returning .
-func (r *Store) Returning(args ...interface{}) {
+// Returns .
+func (r *Store) Returns(args ...interface{}) {
 	r.values = args
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
