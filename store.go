@@ -8,13 +8,18 @@ import (
 	"strings"
 )
 
-type tester interface {
-	Helper()
-	Errorf(str string, v ...interface{})
+// Returner interface used for setting up function results
+type Returner interface {
+	Returns(args ...interface{})
+}
+
+// Retriever interface used for retrieving function results, all args need to be pointers
+type Retriever interface {
+	Retrieve(args ...interface{})
 }
 
 // NewStore .
-func NewStore(t tester) *Store {
+func NewStore(t testingT) *Store {
 	return &Store{
 		t: t,
 	}
@@ -22,7 +27,7 @@ func NewStore(t tester) *Store {
 
 // Store .
 type Store struct {
-	t                tester
+	t                testingT
 	values           []interface{}
 	setLocation      string
 	retrieveFinished func()

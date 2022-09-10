@@ -8,18 +8,14 @@ import (
 	"testing"
 )
 
-// Returner interface used for setting up function results
-type Returner interface {
-	Returns(args ...interface{})
+type testingT interface {
+	Helper()
+	Errorf(str string, v ...interface{})
+	Fatalf(str string, v ...interface{})
 }
 
-// Retriever interface used for retrieving function results, all args need to be pointers
-type Retriever interface {
-	Retrieve(args ...interface{})
-}
-
-// Hasher interface used for hashing parameters
-type Hasher interface {
+// hasher interface used for hashing parameters
+type hasher interface {
 	Hash(args ...interface{}) (uint64, error)
 }
 
@@ -29,7 +25,7 @@ func New(t *testing.T) *FuncMoq {
 }
 
 // New returns a initialized FuncMoq type
-func NewWithCallback(t *testing.T, callback func(key ...interface{})) *FuncMoq {
+func NewWithCallback(t testingT, callback func(key ...interface{})) *FuncMoq {
 	return &FuncMoq{
 		t:            t,
 		results:      make(map[uint64]*Store),
@@ -45,13 +41,13 @@ func NewWithCallback(t *testing.T, callback func(key ...interface{})) *FuncMoq {
 // adding values: funcmoq.With(parm1, param2).Returning(val1, val2, val3)
 // retrieving values: funcmoq.For(parm1, param2).Retrieve(&val1, &val2, &val3)
 type FuncMoq struct {
-	t            *testing.T
+	t            testingT
 	results      map[uint64]*Store
 	CallCount    int
 	Action       func(key ...interface{})
 	setLocations []string
 	//by default FuncMoq uses github.com/mitchellh/hashstructure for hashing the parameters
-	Hasher Hasher
+	Hasher hasher
 }
 
 // For  method used to specific the parameters used when retrieving results.

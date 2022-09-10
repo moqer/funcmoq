@@ -195,11 +195,15 @@ func TestElement_NilErrorInterface(t *testing.T) {
 
 type testerMock struct {
 	errorfCount int
+	fatalfCount int
 	helperCount int
 }
 
 func (m *testerMock) Errorf(str string, args ...interface{}) {
 	m.errorfCount++
+}
+func (m *testerMock) Fatalf(str string, args ...interface{}) {
+	m.fatalfCount++
 }
 func (m *testerMock) Helper() {
 	m.helperCount++
