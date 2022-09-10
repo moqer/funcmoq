@@ -2,12 +2,15 @@ package funcmoq
 
 import (
 	"errors"
+	"fmt"
+	"runtime"
+	"strings"
 	"testing"
 )
 
 // Returner interface used for setting up function results
 type Returner interface {
-	Returning(args ...interface{})
+	Returns(args ...interface{})
 }
 
 // Retriever interface used for retrieving function results, all args need to be pointers
@@ -22,20 +25,17 @@ type Hasher interface {
 
 // New returns a initialized FuncMoq type
 func New(t *testing.T) *FuncMoq {
-	return &FuncMoq{
-		t:       t,
-		results: make(map[uint64]*Store),
-		Hasher:  mitchellhash{},
-	}
+	return NewWithCallback(t, nil)
 }
 
 // New returns a initialized FuncMoq type
 func NewWithCallback(t *testing.T, callback func(key ...interface{})) *FuncMoq {
 	return &FuncMoq{
-		t:       t,
-		results: make(map[uint64]*Store),
-		Hasher:  mitchellhash{},
-		Action:  callback,
+		t:            t,
+		results:      make(map[uint64]*Store),
+		Hasher:       mitchellhash{},
+		Action:       callback,
+		setLocations: make([]string, 0),
 	}
 }
 
@@ -45,21 +45,22 @@ func NewWithCallback(t *testing.T, callback func(key ...interface{})) *FuncMoq {
 // adding values: funcmoq.With(parm1, param2).Returning(val1, val2, val3)
 // retrieving values: funcmoq.For(parm1, param2).Retrieve(&val1, &val2, &val3)
 type FuncMoq struct {
-	t         *testing.T
-	results   map[uint64]*Store
-	CallCount int
-	Action    func(key ...interface{})
+	t            *testing.T
+	results      map[uint64]*Store
+	CallCount    int
+	Action       func(key ...interface{})
+	setLocations []string
 	//by default FuncMoq uses github.com/mitchellh/hashstructure for hashing the parameters
 	Hasher Hasher
 }
 
-var hashErrStr = "Can't create a hash for this set of parameters"
-
 // For  method used to specific the parameters used when retrieving results.
 func (m *FuncMoq) For(key ...interface{}) Retriever {
+	m.t.Helper()
 	result, err := m.get(key...)
 	if err != nil {
-		m.t.Fatal(hashErrStr, err)
+		m.t.Fatalf("No return is set for the parameters: %v\ninner error: %v\nSetup locations:\n%s",
+			key, err, strings.Join(m.setLocations, " \n"))
 	}
 	result.retrieveFinished = func() {
 		m.CallCount++
@@ -85,9 +86,11 @@ func (m *FuncMoq) get(key ...interface{}) (*Store, error) {
 
 // With method used to specific the parameters used when storing results.
 func (m *FuncMoq) With(key ...interface{}) Returner {
+	_, file, line, _ := runtime.Caller(1)
+	m.setLocations = append(m.setLocations, fmt.Sprintf("%s:%d\n\tparams:%v", file, line, key))
 	result, err := m.set(key...)
 	if err != nil {
-		m.t.Fatal(hashErrStr, err)
+		m.t.Fatalf("\nCan't create a hash for this set of parameters\n inner error: %v", err)
 	}
 	return result
 }

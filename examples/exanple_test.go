@@ -109,7 +109,7 @@ func TestDemo_CloseAsset_Error(t *testing.T) {
 
 	//registers the "key" (id, "closed") to return errors.New("Failed upsert")
 	e := errors.New("Failed upsert")
-	m.upsertAsset.With(id, "closed").Returning(e)
+	m.upsertAsset.With(id, "closed").Returns(e)
 	demo := Demo{repo: m}
 
 	//act
@@ -125,7 +125,7 @@ func TestDemo_CloseAsset_Success(t *testing.T) {
 	m := NewRepoMock(t)
 	id := uuid.MustParse("fe1f81f2-6172-4f1a-9377-692a022aec88")
 
-	m.upsertAsset.With(id, "closed").Returning(nil)
+	m.upsertAsset.With(id, "closed").Returns(nil)
 	demo := Demo{repo: m}
 
 	//act
@@ -141,7 +141,7 @@ func TestDemo_IsAssetClosed_Error(t *testing.T) {
 	m := NewRepoMock(t)
 	id := uuid.MustParse("fe1f81f2-6172-4f1a-9377-692a022aec88")
 
-	m.getAssetStatus.With(id).Returning("", errors.New("problem"))
+	m.getAssetStatus.With(id).Returns("", errors.New("problem"))
 	demo := Demo{repo: m}
 
 	//act
@@ -157,7 +157,7 @@ func TestDemo_IsAssetClosed_True(t *testing.T) {
 	m := NewRepoMock(t)
 	id := uuid.MustParse("fe1f81f2-6172-4f1a-9377-692a022aec88")
 
-	m.getAssetStatus.With(id).Returning("closed", nil)
+	m.getAssetStatus.With(id).Returns("closed", nil)
 	demo := Demo{repo: m}
 
 	//act
@@ -174,7 +174,7 @@ func TestDemo_IsAssetClosed_False(t *testing.T) {
 	m := NewRepoMock(t)
 	id := uuid.MustParse("fe1f81f2-6172-4f1a-9377-692a022aec88")
 
-	m.getAssetStatus.With(id).Returning("notclosed", nil)
+	m.getAssetStatus.With(id).Returns("notclosed", nil)
 	demo := Demo{repo: m}
 
 	//act
@@ -190,7 +190,7 @@ func TestDemo_GetNumberOfClosedAssets_Error(t *testing.T) {
 	//arrange
 	m := NewRepoMock(t)
 
-	m.getAllAssets.With().Returning(nil, errors.New("problem"))
+	m.getAllAssets.With().Returns(nil, errors.New("problem"))
 	demo := Demo{repo: m}
 
 	//act
@@ -206,7 +206,7 @@ func TestDemo_GetNumberOfClosedAssets_AllClosed(t *testing.T) {
 	//arrange
 	m := NewRepoMock(t)
 
-	m.getAllAssets.With().Returning([]string{"closed", "closed", "closed", "closed"}, nil)
+	m.getAllAssets.With().Returns([]string{"closed", "closed", "closed", "closed"}, nil)
 	demo := Demo{repo: m}
 
 	//act
@@ -223,7 +223,7 @@ func TestDemo_GetNumberOfClosedAssets_2Closed(t *testing.T) {
 	//arrange
 	m := NewRepoMock(t)
 
-	m.getAllAssets.With().Returning([]string{"closed", "closed", "open", "clos"}, nil)
+	m.getAllAssets.With().Returns([]string{"closed", "closed", "open", "clos"}, nil)
 	demo := Demo{repo: m}
 
 	//act
@@ -240,7 +240,7 @@ func TestDemo_DeleteIfClosed_GetAssetStatusError(t *testing.T) {
 	m := NewRepoMock(t)
 	id := uuid.MustParse("fe1f81f2-6172-4f1a-9377-692a022aec88")
 
-	m.getAssetStatus.With(id).Returning("", errors.New("problem"))
+	m.getAssetStatus.With(id).Returns("", errors.New("problem"))
 	demo := Demo{repo: m}
 
 	//act
@@ -257,8 +257,8 @@ func TestDemo_DeleteIfClosed_DeleteAssetError(t *testing.T) {
 	m := NewRepoMock(t)
 	id := uuid.MustParse("fe1f81f2-6172-4f1a-9377-692a022aec88")
 
-	m.getAssetStatus.With(id).Returning("closed", nil)
-	m.deleteAsset.With(id).Returning(errors.New("problem"))
+	m.getAssetStatus.With(id).Returns("closed", nil)
+	m.deleteAsset.With(id).Returns(errors.New("problem"))
 	demo := Demo{repo: m}
 
 	//act
@@ -275,8 +275,8 @@ func TestDemo_DeleteIfClosed_NotClosed(t *testing.T) {
 	m := NewRepoMock(t)
 	id := uuid.MustParse("fe1f81f2-6172-4f1a-9377-692a022aec88")
 
-	m.getAssetStatus.With(id).Returning("open", nil)
-	m.deleteAsset.With(id).Returning(errors.New("problem"))
+	m.getAssetStatus.With(id).Returns("open", nil)
+	m.deleteAsset.With(id).Returns(errors.New("problem"))
 	demo := Demo{repo: m}
 
 	//act
@@ -293,8 +293,8 @@ func TestDemo_DeleteIfClosed_Closed(t *testing.T) {
 	m := NewRepoMock(t)
 	id := uuid.MustParse("fe1f81f2-6172-4f1a-9377-692a022aec88")
 
-	m.getAssetStatus.With(id).Returning("closed", nil)
-	m.deleteAsset.With(id).Returning(nil)
+	m.getAssetStatus.With(id).Returns("closed", nil)
+	m.deleteAsset.With(id).Returns(nil)
 	demo := Demo{repo: m}
 
 	//act
