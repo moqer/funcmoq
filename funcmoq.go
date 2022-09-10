@@ -30,7 +30,7 @@ func New(t *testing.T) *FuncMoq {
 }
 
 // FuncMoq boilerplate friendly object for mocking functions.
-// The type acts as a dynamic hashmap, to register a key use With method to retrive a previous set value use For method.
+// The type acts as a dynamic hashmap, to register a key use With method to retrieve a previous set value use For method.
 // The api should look like this:
 // adding values: funcmoq.With(parm1, param2).Returning(val1, val2, val3)
 // retrieving values: funcmoq.For(parm1, param2).Retrieve(&val1, &val2, &val3)
@@ -53,7 +53,9 @@ func (m *FuncMoq) For(key ...interface{}) Retriever {
 	}
 	result.retrieveFinished = func() {
 		m.CallCount++
-		m.Action()
+		if m.Action != nil {
+			m.Action()
+		}
 	}
 	return result
 }

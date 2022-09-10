@@ -108,14 +108,15 @@ func TestDemo_CloseAsset_Error(t *testing.T) {
 	id := uuid.MustParse("fe1f81f2-6172-4f1a-9377-692a022aec88")
 
 	//registers the "key" (id, "closed") to return errors.New("Failed upsert")
-	m.upsertAsset.With(id, "closed").Returning(errors.New("Failed upsert"))
+	e := errors.New("Failed upsert")
+	m.upsertAsset.With(id, "closed").Returning(e)
 	demo := Demo{repo: m}
 
 	//act
 	err := demo.CloseAsset(id)
 
 	//assert
-	assert.NotNil(t, err)
+	assert.Equal(t, e, err)
 	assert.Equal(t, 1, m.upsertAsset.CallCount)
 }
 

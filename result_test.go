@@ -43,64 +43,64 @@ type Tester interface {
 
 func TestSlice_Int(t *testing.T) {
 	expected := []int{1, 2, 3, 4}
-	result := Store{}
+	result := NewStore(t)
 	result.Returning(nil, expected)
 	var actual []int
 	var err error
 	result.Retrieve(&err, &actual)
 	for i := range expected {
-		assert.Equal(t, actual[i], expected[i])
+		assert.Equal(t, expected[i], actual[i])
 	}
 }
 func TestSlice_CustomStruct(t *testing.T) {
 	expected := []CustomStruct{newCustomStruct()}
-	result := Store{}
+	result := NewStore(t)
 	result.Returning(nil, expected)
 	var actual []CustomStruct
 	var err error
 	result.Retrieve(&err, &actual)
 	for i := range expected {
-		assert.Equal(t, actual[i], expected[i])
+		assert.Equal(t, expected[i], actual[i])
 	}
 }
 func TestArray_Int(t *testing.T) {
 	expected := [4]int{1, 2, 3, 4}
-	result := Store{}
+	result := NewStore(t)
 	result.Returning(nil, expected)
 	var actual [4]int
 	var err error
 	result.Retrieve(&err, &actual)
 	for i := range expected {
-		assert.Equal(t, actual[i], expected[i])
+		assert.Equal(t, expected[i], actual[i])
 	}
 }
 func TestArray_CustomStruct(t *testing.T) {
 	expected := [2]CustomStruct{newCustomStruct(), newCustomStruct()}
-	result := Store{}
+	result := NewStore(t)
 	result.Returning(nil, expected)
 	var actual [2]CustomStruct
 	var err error
 	result.Retrieve(&err, &actual)
 	for i := range expected {
-		assert.Equal(t, actual[i], expected[i])
+		assert.Equal(t, expected[i], actual[i])
 	}
 }
 func TestArray_CustomStructPointers(t *testing.T) {
 	c1 := newCustomStruct()
 	c2 := newCustomStruct()
 	expected := [2]*CustomStruct{&c1, &c2}
-	result := Store{}
+	result := NewStore(t)
 	result.Returning(nil, expected)
 	var actual [2]*CustomStruct
 	var err error
 	result.Retrieve(&err, &actual)
 	for i := range expected {
-		assert.Equal(t, actual[i], expected[i])
+		assert.Equal(t, expected[i], actual[i])
 	}
 }
 func TestElement_Int(t *testing.T) {
 	expected := 1
-	result := Store{}
+	result := NewStore(t)
 	result.Returning(nil, expected)
 	var actual int
 	var err error
@@ -109,7 +109,7 @@ func TestElement_Int(t *testing.T) {
 }
 func TestElement_string(t *testing.T) {
 	expected := "test"
-	result := Store{}
+	result := NewStore(t)
 	result.Returning(nil, expected)
 	var actual string
 	var err error
@@ -118,7 +118,7 @@ func TestElement_string(t *testing.T) {
 }
 func TestElement_CustomStruct(t *testing.T) {
 	expected := newCustomStruct()
-	result := Store{}
+	result := NewStore(t)
 	result.Returning(nil, expected)
 	var actual CustomStruct
 	var err error
@@ -128,7 +128,7 @@ func TestElement_CustomStruct(t *testing.T) {
 func TestElement_IntPointer(t *testing.T) {
 	tmp := 1
 	expected := &tmp
-	result := Store{}
+	result := NewStore(t)
 	result.Returning(nil, expected)
 	var actual *int
 	var err error
@@ -138,7 +138,7 @@ func TestElement_IntPointer(t *testing.T) {
 func TestElement_StringPointer(t *testing.T) {
 	tmp := "test"
 	expected := &tmp
-	result := Store{}
+	result := NewStore(t)
 	result.Returning(nil, expected)
 	var actual *string
 	var err error
@@ -148,7 +148,7 @@ func TestElement_StringPointer(t *testing.T) {
 func TestElement_CustomStringPointer(t *testing.T) {
 	tmp := newCustomStruct()
 	expected := &tmp
-	result := Store{}
+	result := NewStore(t)
 	result.Returning(nil, expected)
 	var actual *CustomStruct
 	var err error
@@ -157,7 +157,7 @@ func TestElement_CustomStringPointer(t *testing.T) {
 }
 func TestElement_EmptyInterface(t *testing.T) {
 	var expected interface{} = 1
-	result := Store{}
+	result := NewStore(t)
 	result.Returning(nil, expected)
 	var actual interface{}
 	var err error
@@ -166,7 +166,7 @@ func TestElement_EmptyInterface(t *testing.T) {
 }
 func TestElement_TesterInterface(t *testing.T) {
 	var expected Tester = newCustomStruct()
-	result := Store{}
+	result := NewStore(t)
 	result.Returning(nil, expected)
 	var actual CustomStruct
 	var err error
@@ -175,19 +175,35 @@ func TestElement_TesterInterface(t *testing.T) {
 }
 func TestElement_TesterInterface2(t *testing.T) {
 	expected := newCustomStruct()
-	result := Store{}
+	result := NewStore(t)
 	result.Returning(nil, expected)
 	var actual Tester
 	var err error
 	result.Retrieve(&err, &actual)
 	assert.Equal(t, expected, actual)
 }
+
 func TestElement_NilErrorInterface(t *testing.T) {
 	var expected error
-	result := Store{}
+	result := NewStore(t)
 	result.Returning(nil, expected)
 	var actual error
 	var err error
 	result.Retrieve(&err, &actual)
 	assert.Equal(t, expected, actual)
 }
+
+// to test this mock the testing framework
+// func TestRetrieve_Error_DifferentNoOfParameters(t *testing.T) {
+// 	defer func() { //the unsubscribe call inside the Process will panic due to poorly mocked subscription
+// 		_ = recover()
+
+// 		assert.True(t, true)
+// 	}()
+// 	var expected error
+// 	result := Store{t: t}
+// 	result.Returning(error(nil), expected)
+// 	var actual error
+// 	var err error
+// 	result.Retrieve(err, actual, actual)
+// }
