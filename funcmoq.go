@@ -29,7 +29,7 @@ func NewWithCallback(t testingT, callback func(key ...interface{})) *FuncMoq {
 	return &FuncMoq{
 		t:            t,
 		results:      make(map[uint64]*Store),
-		Hasher:       mitchellhash{},
+		hasher:       mitchellhash{},
 		Action:       callback,
 		setLocations: make([]string, 0),
 	}
@@ -46,8 +46,7 @@ type FuncMoq struct {
 	CallCount    int
 	Action       func(key ...interface{})
 	setLocations []string
-	//by default FuncMoq uses github.com/mitchellh/hashstructure for hashing the parameters
-	Hasher hasher
+	hasher       hasher
 }
 
 // For  method used to specific the parameters used when retrieving results.
@@ -61,7 +60,7 @@ func (m *FuncMoq) For(key ...interface{}) Retriever {
 	result.retrieveFinished = func() {
 		m.CallCount++
 		if m.Action != nil {
-			m.Action()
+			m.Action(key)
 		}
 	}
 	return result
@@ -69,7 +68,7 @@ func (m *FuncMoq) For(key ...interface{}) Retriever {
 
 // get implementation of For method used to inspect the err
 func (m *FuncMoq) get(key ...interface{}) (*Store, error) {
-	hash, err := m.Hasher.Hash(key, nil)
+	hash, err := m.hasher.Hash(key, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +93,7 @@ func (m *FuncMoq) With(key ...interface{}) Returner {
 // set implementation of With method used to inspect the err
 func (m *FuncMoq) set(key ...interface{}) (Returner, error) {
 	br := NewStore(m.t)
-	hash, err := m.Hasher.Hash(key, nil)
+	hash, err := m.hasher.Hash(key, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -9,56 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-//Repository type to be mocked
-type Repository interface {
-	GetAssetStatus(id uuid.UUID) (string, error)
-	GetAllAssets() ([]string, error)
-	UpsertAsset(id uuid.UUID, status string) error
-	DeleteAsset(id uuid.UUID) error
-}
-
-//Demo repository consumer
-type Demo struct {
-	repo Repository
-}
-
-func (d Demo) CloseAsset(id uuid.UUID) error {
-	return d.repo.UpsertAsset(id, "closed")
-}
-func (d Demo) IsAssetClosed(id uuid.UUID) (bool, error) {
-	status, err := d.repo.GetAssetStatus(id)
-	if err != nil {
-		return false, err
-	}
-	return status == "closed", nil
-}
-func (d Demo) GetNumberOfClosedAssets() (int, error) {
-	stats, err := d.repo.GetAllAssets()
-	if err != nil {
-		return 0, err
-	}
-	sum := 0
-	for _, s := range stats {
-		if s == "closed" {
-			sum++
-		}
-	}
-
-	return sum, nil
-}
-func (d Demo) DeleteIfClosed(id uuid.UUID) error {
-	status, err := d.repo.GetAssetStatus(id)
-	if err != nil {
-		return err
-	}
-
-	if status == "closed" {
-		return d.repo.DeleteAsset(id)
-	}
-
-	return nil
-}
-
 //NewRepoMock Creates a  mock repository
 func NewRepoMock(t *testing.T) *RepoMock {
 	return &RepoMock{
@@ -149,7 +99,7 @@ func TestDemo_IsAssetClosed_Error(t *testing.T) {
 
 	//assert
 	assert.NotNil(t, err)
-	assert.Equal(t, 1, m.getAssetStatus.CallCount)
+	assert.True(t, m.getAssetStatus.Called())
 }
 
 func TestDemo_IsAssetClosed_True(t *testing.T) {
@@ -165,7 +115,7 @@ func TestDemo_IsAssetClosed_True(t *testing.T) {
 
 	//assert
 	assert.Nil(t, err)
-	assert.Equal(t, 1, m.getAssetStatus.CallCount)
+	assert.True(t, m.getAssetStatus.Called())
 	assert.Equal(t, true, isClosed)
 }
 
@@ -182,7 +132,7 @@ func TestDemo_IsAssetClosed_False(t *testing.T) {
 
 	//assert
 	assert.Nil(t, err)
-	assert.Equal(t, 1, m.getAssetStatus.CallCount)
+	assert.True(t, m.getAssetStatus.Called())
 	assert.Equal(t, false, isClosed)
 }
 
@@ -198,7 +148,7 @@ func TestDemo_GetNumberOfClosedAssets_Error(t *testing.T) {
 
 	//assert
 	assert.NotNil(t, err)
-	assert.Equal(t, 1, m.getAllAssets.CallCount)
+	assert.True(t, m.getAllAssets.Called())
 
 }
 
@@ -214,7 +164,7 @@ func TestDemo_GetNumberOfClosedAssets_AllClosed(t *testing.T) {
 
 	//assert
 	assert.Nil(t, err)
-	assert.Equal(t, 1, m.getAllAssets.CallCount)
+	assert.True(t, m.getAllAssets.Called())
 	assert.Equal(t, 4, no)
 
 }
@@ -231,7 +181,7 @@ func TestDemo_GetNumberOfClosedAssets_2Closed(t *testing.T) {
 
 	//assert
 	assert.Nil(t, err)
-	assert.Equal(t, 1, m.getAllAssets.CallCount)
+	assert.True(t, m.getAllAssets.Called())
 	assert.Equal(t, 2, no)
 }
 
@@ -248,7 +198,7 @@ func TestDemo_DeleteIfClosed_GetAssetStatusError(t *testing.T) {
 
 	//assert
 	assert.NotNil(t, err)
-	assert.Equal(t, 1, m.getAssetStatus.CallCount)
+	assert.True(t, m.getAssetStatus.Called())
 	assert.Equal(t, 0, m.deleteAsset.CallCount)
 }
 
@@ -266,7 +216,7 @@ func TestDemo_DeleteIfClosed_DeleteAssetError(t *testing.T) {
 
 	//assert
 	assert.NotNil(t, err)
-	assert.Equal(t, 1, m.getAssetStatus.CallCount)
+	assert.True(t, m.getAssetStatus.Called())
 	assert.Equal(t, 1, m.deleteAsset.CallCount)
 }
 
@@ -284,7 +234,7 @@ func TestDemo_DeleteIfClosed_NotClosed(t *testing.T) {
 
 	//assert
 	assert.Nil(t, err)
-	assert.Equal(t, 1, m.getAssetStatus.CallCount)
+	assert.True(t, m.getAssetStatus.Called())
 	assert.Equal(t, 0, m.deleteAsset.CallCount)
 }
 
@@ -302,6 +252,6 @@ func TestDemo_DeleteIfClosed_Closed(t *testing.T) {
 
 	//assert
 	assert.Nil(t, err)
-	assert.Equal(t, 1, m.getAssetStatus.CallCount)
+	assert.True(t, m.getAssetStatus.Called())
 	assert.Equal(t, 1, m.deleteAsset.CallCount)
 }
