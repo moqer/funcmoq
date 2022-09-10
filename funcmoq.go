@@ -29,6 +29,16 @@ func New(t *testing.T) *FuncMoq {
 	}
 }
 
+// New returns a initialized FuncMoq type
+func NewWithCallback(t *testing.T, callback func(key ...interface{})) *FuncMoq {
+	return &FuncMoq{
+		t:       t,
+		results: make(map[uint64]*Store),
+		Hasher:  mitchellhash{},
+		Action:  callback,
+	}
+}
+
 // FuncMoq boilerplate friendly object for mocking functions.
 // The type acts as a dynamic hashmap, to register a key use With method to retrieve a previous set value use For method.
 // The api should look like this:
@@ -38,7 +48,7 @@ type FuncMoq struct {
 	t         *testing.T
 	results   map[uint64]*Store
 	CallCount int
-	Action    func()
+	Action    func(key ...interface{})
 	//by default FuncMoq uses github.com/mitchellh/hashstructure for hashing the parameters
 	Hasher Hasher
 }
